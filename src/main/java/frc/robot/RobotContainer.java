@@ -152,10 +152,10 @@ public class RobotContainer {
     controller
         .x()
         .whileTrue(
-            DriveCommands.Translation2d(1.0, 1.0)
+            //DriveCommands.Translation2d(1.0, 1.0)
             //Commands.startRun(
                 //() -> {
-                  aimController.reset();
+                  //aimController.reset();
                 //},
                 //()->{},
                 //() -> {
@@ -166,7 +166,7 @@ public class RobotContainer {
                 //},
                 //()->{DriveCommands.Translation2d(1.0, 1.0);},
                 //drive)
-                );
+                //);
 
     // Reset gyro to 0° when B button is pressed
     controller
@@ -175,9 +175,9 @@ public class RobotContainer {
             Commands.runOnce(
                     () ->
                         drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                            new Pose2d((drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
-                .ignoringDisable(true));
+                .ignoringDisable(true)));
   }
 
   /**
