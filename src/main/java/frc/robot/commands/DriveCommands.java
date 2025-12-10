@@ -156,6 +156,52 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
+  // ---------------- Manual drive command added by Brenden ---------------- //
+  public static Command manualDrive(
+      Drive drive, Supplier<Rotation2d> rotationSupplier, double xVel, double yVel) {
+
+    // Create PID controller
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    return Commands.run(
+        () -> {
+          // Get linear velocity
+          // Translation2d linearVelocity =
+          //     getLinearVelocityFromJoysticks(xVel, yVel);
+          Translation2d linearVelocity =
+              new Translation2d(xVel, yVel); // attempt to override linearVelocity from joysticks
+
+          // Calculate angular speed
+          double omega =
+              angleController.calculate(
+                  drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+
+          // Convert to field relative speeds & send command
+          ChassisSpeeds speeds =
+              new ChassisSpeeds(
+                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                  omega);
+          boolean isFlipped =
+              DriverStation.getAlliance().isPresent()
+                  && DriverStation.getAlliance().get() == Alliance.Red;
+          drive.runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  speeds,
+                  isFlipped
+                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                      : drive.getRotation()));
+        },
+        drive);
+  }
+  // ---------------- Manual drive command added by Brenden ---------------- //
+
   /**
    * Measures the velocity feedforward constants for the drive motors.
    *

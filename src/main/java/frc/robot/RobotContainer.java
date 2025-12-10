@@ -17,7 +17,6 @@ import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -147,8 +146,13 @@ public class RobotContainer {
                 () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
-    PIDController aimController = new PIDController(0.2, 0.0, 0.0);
-    aimController.enableContinuousInput(-Math.PI, Math.PI);
+
+    // PIDController aimController = new PIDController(0.2, 0.0, 0.0);
+    // aimController.enableContinuousInput(-Math.PI, Math.PI);
+    // -------------- REALLY JANK MANUAL DRIVE COMMAND RIGHT NOW -------------- //
+    controller
+        .rightBumper()
+        .whileTrue(DriveCommands.manualDrive(drive, () -> new Rotation2d(), 1.0, 1.0));
     // controller
     //     .x()
     //     .whileTrue(float temp = 2.0f;);
